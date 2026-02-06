@@ -1,5 +1,5 @@
 import streamlit as st
-import geemap.foliumap as geemap
+import geemap
 import ee
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,7 +14,7 @@ def authenticate_ee():
     try:
         # StreamlitのSecrets管理画面に貼り付けたJSONを読み込む
         # 後ほど設定する名前: "earth_engine_key"
-        ee_key_dict = json.loads(st.secrets["earth_engine_key"])
+        ee_key_dict = json.loads(st.secrets["earth_engine_json"])
         credentials = ee.ServiceAccountCredentials(ee_key_dict['client_email'], key_data=json.dumps(ee_key_dict))
         ee.Initialize(credentials, project=st.secrets["project_id"])
     except Exception as e:
