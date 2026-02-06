@@ -1,0 +1,11 @@
+# Pythonのキャッシュ
+__pycache__/
+*.py[cod]
+
+# ローカルの環境設定ファイル（秘密鍵など）
+.env
+*.json
+.streamlit/secrets.toml
+
+# OS固有のファイル
+.DS_Store
