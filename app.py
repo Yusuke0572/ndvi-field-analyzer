@@ -39,19 +39,21 @@ with st.sidebar:
     analysis_years = st.slider("解析年数 (過去)", 1, 5, 3)
     st.info("1. 左のツールバーで範囲を囲む\n2. 自動的に解析が始まります")
 
-# --- 3. 地図の表示（修正箇所） ---
 # --- 3. 地図の表示 ---
 m = geemap.Map(center=[35.181, 136.906], zoom=14)
 m.add_basemap('HYBRID')
 
-# 修正ポイント: m (geemapオブジェクト) をそのまま渡さず、
-# m.to_folium() を使って純粋な folium オブジェクトに変換して渡します。
+# 修正ポイント: 
+# 1. m をそのまま渡します（to_foliumは使いません）
+# 2. use_container_width=True を追加してレイアウトを安定させます
+# 3. returned_objects を明示的に指定して、解析に必要なデータだけを取得します
 map_data = st_folium(
-    m.to_folium(),  # ここを修正
+    m, 
     height=600, 
-    width=800, 
+    width=800,
+    use_container_width=True,
     key="main_map",
-    returned_objects=["last_active_drawing"] # 必要なデータだけ指定すると動作が軽くなります
+    returned_objects=["last_active_drawing"]
 )
 
 # --- 4. 解析ロジック ---
