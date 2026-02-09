@@ -159,7 +159,7 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                     gmap_url = f"https://www.google.com/maps?q={lat},{lon}"
                     st.markdown(f'### [📍 Google Mapで現地を確認]({gmap_url})')
 
-                # --- 4. 解析ロジック内、グラフ描画部分 ---
+# --- 4. 解析ロジック内、グラフ描画部分 ---
                 with col2:
                     font_path = 'fonts/NotoSansJP-Regular.ttf'
                     jp_font = None
@@ -167,68 +167,72 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
 
                     if os.path.exists(font_path):
                         try:
-                            jp_font = fm.FontProperties(fname=font_path)
+                            # 太字設定をデフォルトに
+                            jp_font = fm.FontProperties(fname=font_path, weight='bold')
                             jp_font_bold = fm.FontProperties(fname=font_path, weight='bold')
                         except Exception as e:
                             st.error(f"フォント読み込みエラー: {e}")
                     
-                    # --- グラフ全体の濃さを強制設定する設定 ---
-                    dark_gray = '#2c2c2c'  # 炭色
+                    # --- 完全な黒と太い線の設定 ---
+                    pure_black = 'black'
                     plt.rcParams.update({
-                        'text.color': dark_gray,
-                        'axes.labelcolor': dark_gray,
-                        'axes.edgecolor': dark_gray,
-                        'xtick.color': dark_gray,
-                        'ytick.color': dark_gray,
-                        'axes.linewidth': 1.5      # 外枠をハッキリ
+                        'text.color': pure_black,
+                        'axes.labelcolor': pure_black,
+                        'axes.edgecolor': pure_black,
+                        'xtick.color': pure_black,
+                        'ytick.color': pure_black,
+                        'axes.labelweight': 'bold',
+                        'axes.linewidth': 2.0      # 枠線をかなり太く
                     })
 
                     fig, ax = plt.subplots(figsize=(10, 5))
                     
-                    # プロット自体の線
-                    ax.plot(df['Date'], df['NDVI'], marker='o', markersize=5, color='#2ecc71', linestyle='-', linewidth=2)
+                    # プロット自体の線も太くして存在感を出す
+                    ax.plot(df['Date'], df['NDVI'], marker='o', markersize=6, color='#2ecc71', linestyle='-', linewidth=2.5)
                     
-                    # 閾値の線
-                    ax.axhline(y=0.3, color='#d63031', linestyle='--', alpha=0.9, 
+                    # 閾値の線（赤色を濃く、透過なしに）
+                    ax.axhline(y=0.3, color='#ff0000', linestyle='--', alpha=1.0, linewidth=2,
                                label='閾値 (0.3)' if jp_font else 'Threshold (0.3)')
                     
-                    # タイトルの強化
+                    # タイトル（最大サイズ + 太字）
                     ax.set_title(f"NDVI時系列推移 (過去 {analysis_years} 年間)" if jp_font else f"NDVI Time Series", 
-                                 fontproperties=jp_font_bold, fontsize=15, pad=20)
+                                 fontproperties=jp_font_bold, fontsize=16, pad=20)
                     
-                    # 軸ラベル
-                    ax.set_ylabel("NDVI", fontproperties=jp_font_bold, fontsize=12)
-                    ax.set_xlabel("日付" if jp_font else "Date", fontproperties=jp_font_bold, fontsize=12)
+                    # 軸ラベル（サイズアップ + 太字）
+                    ax.set_ylabel("NDVI", fontproperties=jp_font_bold, fontsize=13)
+                    ax.set_xlabel("日付" if jp_font else "Date", fontproperties=jp_font_bold, fontsize=13)
                     
-                    # 目盛り数字のフォント適用（色は全体のupdateで適用済み）
+                    # 目盛り数字をすべて太字・黒に
+                    ax.tick_params(axis='both', which='major', labelsize=11, width=2.0)
                     for tick in ax.get_xticklabels():
-                        tick.set_fontproperties(jp_font)
+                        tick.set_fontproperties(jp_font_bold)
                     for tick in ax.get_yticklabels():
-                        tick.set_fontproperties(jp_font)
+                        tick.set_fontproperties(jp_font_bold)
 
-                    # 凡例（枠線も濃く）
+                    # 凡例（枠も黒く太く）
                     if jp_font:
-                        leg = ax.legend(prop=jp_font, frameon=True, loc='upper right')
-                        leg.get_frame().set_edgecolor(dark_gray)
+                        leg = ax.legend(prop=jp_font_bold, frameon=True, loc='upper right')
+                        leg.get_frame().set_edgecolor(pure_black)
+                        leg.get_frame().set_linewidth(1.5)
                     else:
                         ax.legend()
                     
                     ax.set_ylim(-0.1, 1.0)
-                    ax.grid(True, linestyle=':', alpha=0.5, color='#888888') 
+                    ax.grid(True, linestyle='-', alpha=0.3, color='#888888') # グリッドは実線にして見やすく
 
                     st.pyplot(fig)
 
-                    # 画像ダウンロード
+                    # 画像ダウンロード（DPIを300に上げて高精細に）
                     from io import BytesIO
                     buf = BytesIO()
-                    fig.savefig(buf, format="png", dpi=150)
+                    fig.savefig(buf, format="png", dpi=300, bbox_inches='tight')
                     st.download_button(
                         label="📥 グラフを保存 (Word/報告書用)",
                         data=buf.getvalue(),
                         file_name=f"NDVI_Report_{datetime.now().strftime('%Y%m%d')}.png",
                         mime="image/png"
                     )
-
+                    
         except Exception as e:
             st.error(f"解析エラーが発生しました: {e}")
 else:
