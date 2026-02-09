@@ -182,7 +182,7 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                         'xtick.color': pure_black,
                         'ytick.color': pure_black,
                         'axes.labelweight': 'bold',
-                        'axes.linewidth': 2.0      # 枠線をかなり太く
+                        'axes.linewidth': 1.0      # 枠線をかなり太く
                     })
 
                     fig, ax = plt.subplots(figsize=(10, 5))
@@ -232,7 +232,7 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                         file_name=f"NDVI_Report_{datetime.now().strftime('%Y%m%d')}.png",
                         mime="image/png"
                     )
-                    
+
         except Exception as e:
             st.error(f"解析エラーが発生しました: {e}")
 else:
