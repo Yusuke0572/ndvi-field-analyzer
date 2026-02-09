@@ -5,3 +5,4 @@ pandas
 matplotlib
 python-box
 streamlit-folium
+japanize-matplotlib
