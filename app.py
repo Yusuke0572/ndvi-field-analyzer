@@ -60,15 +60,15 @@ def add_ee_layer(self, ee_image_object, vis_params, name):
 folium.Map.add_ee_layer = add_ee_layer
 
 # ハイブリッド表示（衛星写真）の追加
-# 衛星写真の背景として Google のタイル等を表示したい場合は以下のように記述
+# max_zoom と max_native_zoom を指定することで、ズームしても消えないようにします
 folium.TileLayer(
     tiles='https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
     attr='Google',
     name='Google Satellite',
     overlay=False,
-    control=True
-    max_zoom=22,
-    max_native_zoom=18
+    control=True,
+    max_zoom=22,         # 地図としてズーム可能な最大値
+    max_native_zoom=18   # Google衛星写真タイルが存在する最大ズームレベル（これ以上は引き伸ばして表示）
 ).add_to(m)
 
 # 描画コントロールを追加（範囲選択用）
