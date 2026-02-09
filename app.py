@@ -162,15 +162,29 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                     # --- 4. 解析ロジック内、グラフ描画部分 ---
 
                     with col2:
-                        # グラフ描画
+                        # フォントの読み込み
+                        font_path = 'fonts/NotoSansJP-Regular.ttf'
+                        # フォントが存在する場合のみ適用（エラー回避のため）
+                        import os
+                        if os.path.exists(font_path):
+                            jp_font = fm.FontProperties(fname=font_path)
+                        else:
+                            jp_font = None
+
                         fig, ax = plt.subplots(figsize=(10, 5))
                         ax.plot(df['Date'], df['NDVI'], marker='o', markersize=4, color='#2ecc71', linestyle='-', linewidth=1)
-                        ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.5, label='閾値 (0.3)') # 英語ラベルへ
-                        ax.set_title(f"NDVI時系列グラフ (過去 {analysis_years} 年間)") # 英語タイトルへ
-                        ax.set_ylabel("NDVI")
+                        
+                        # ラベルとタイトルに fontproperties を指定
+                        ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.5, label='閾値 (0.3)')
+                        ax.set_title(f"NDVI時系列推移 (過去 {analysis_years} 年間)", fontproperties=jp_font)
+                        ax.set_ylabel("NDVI", fontproperties=jp_font)
+                        ax.set_xlabel("日付", fontproperties=jp_font)
+                        
+                        # 凡例も日本語化
+                        ax.legend(prop=jp_font)
+                        
                         ax.set_ylim(-0.1, 1.0)
                         ax.grid(True, alpha=0.2)
-                        ax.legend()
                         st.pyplot(fig)
 
                     # 画像ダウンロード
