@@ -67,6 +67,8 @@ folium.TileLayer(
     name='Google Satellite',
     overlay=False,
     control=True
+    max_zoom=22,
+    max_native_zoom=18
 ).add_to(m)
 
 # 描画コントロールを追加（範囲選択用）
