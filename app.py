@@ -8,6 +8,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 import json
+import matplotlib.font_manager as fm  # ← ここで 'fm' として定義します
+import os
 
 # --- 0. 日本語豆腐対策（最新Python対応） ---
 import matplotlib
