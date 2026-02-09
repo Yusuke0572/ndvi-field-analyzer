@@ -1,6 +1,7 @@
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
+from folium.plugins import Geocoder
 import geemap
 import ee
 import pandas as pd
@@ -86,7 +87,6 @@ map_data = st_folium(
 )
 
 # 2. 地図検索機能（Geocoder）を追加
-from folium.plugins import Geocoder
 Geocoder(
     collapsed=True,           # 最初はアイコンだけ表示
     position='topright',      # 右上に配置
