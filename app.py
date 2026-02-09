@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_folium import st_folium
 import geemap
 import ee
 import pandas as pd
@@ -38,16 +39,16 @@ with st.sidebar:
     analysis_years = st.slider("解析年数 (過去)", 1, 5, 3)
     st.info("1. 左のツールバーで範囲を囲む\n2. 自動的に解析が始まります")
 
-# --- 3. 地図の表示 ---
+# --- 3. 地図の表示（修正箇所） ---
 m = geemap.Map(center=[35.181, 136.906], zoom=14)
 m.add_basemap('HYBRID')
 
-# 地図を表示し、描画データを取得
-# st_foliumのように動作し、戻り値に描画情報が含まれます
-map_data = m.to_streamlit(height=600, key="geemap")
+# m.to_streamlit() の代わりに st_folium() を使います。これが最も安定します。
+# 戻り値 map_data には、描画された図形のデータが自動的に入ります。
+map_data = st_folium(m, height=600, width=800, key="main_map")
 
 # --- 4. 解析ロジック ---
-# エラー回避のため、map_data が辞書形式であることをより厳密にチェックします
+# map_data が辞書型であることを確認して処理を開始
 if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
     st.divider()
     # (以下、解析ロジックは変更なし)
