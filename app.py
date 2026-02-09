@@ -85,6 +85,15 @@ map_data = st_folium(
     returned_objects=["last_active_drawing"]
 )
 
+# 2. 地図検索機能（Geocoder）を追加
+from folium.plugins import Geocoder
+Geocoder(
+    collapsed=True,           # 最初はアイコンだけ表示
+    position='topright',      # 右上に配置
+    add_marker=True,          # 検索場所にピンを立てる
+    placeholder='場所を検索'    # 検索窓のテキスト
+).add_to(m)
+
 # --- 4. 解析ロジック ---
 # map_data が辞書型であることを確認して処理を開始
 if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
