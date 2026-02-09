@@ -39,18 +39,18 @@ with st.sidebar:
     st.info("1. 左のツールバーで範囲を囲む\n2. 自動的に解析が始まります")
 
 # --- 3. 地図の表示 ---
-# 地図オブジェクトの作成
 m = geemap.Map(center=[35.181, 136.906], zoom=14)
 m.add_basemap('HYBRID')
 
-# 地図を表示し、入力を受け取る
-# ※ geemapの最新版では st_pydeck よりも foliumベースのこれを使います
-map_data = m.to_streamlit(height=600)
+# 地図を表示し、描画データを取得
+# st_foliumのように動作し、戻り値に描画情報が含まれます
+map_data = m.to_streamlit(height=600, key="geemap")
 
 # --- 4. 解析ロジック ---
-# map_data が None でないこと、および描画データがあることを確認
-if map_data is not None and map_data.get("last_active_drawing"):
+# エラー回避のため、map_data が辞書形式であることをより厳密にチェックします
+if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
     st.divider()
+    # (以下、解析ロジックは変更なし)
     with st.spinner("衛星データを解析中..."):
         try:
             # 描画図形の取得
