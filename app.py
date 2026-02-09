@@ -159,7 +159,7 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                     gmap_url = f"https://www.google.com/maps?q={lat},{lon}"
                     st.markdown(f'### [📍 Google Mapで現地を確認]({gmap_url})')
 
-# --- 4. 解析ロジック内、グラフ描画部分 ---
+                # --- 4. 解析ロジック内、グラフ描画部分 ---
                 with col2:
                     font_path = 'fonts/NotoSansJP-Regular.ttf'
                     jp_font = None
@@ -167,58 +167,60 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
 
                     if os.path.exists(font_path):
                         try:
-                            # 太字設定をデフォルトに
                             jp_font = fm.FontProperties(fname=font_path, weight='bold')
                             jp_font_bold = fm.FontProperties(fname=font_path, weight='bold')
                         except Exception as e:
                             st.error(f"フォント読み込みエラー: {e}")
                     
-                    # --- 完全な黒と太い線の設定 ---
+                    # --- 文字は黒く、枠線は適切に ---
                     pure_black = 'black'
+                    border_color = '#333333' # 枠線だけ少しだけ色を落とす
+                    
                     plt.rcParams.update({
                         'text.color': pure_black,
                         'axes.labelcolor': pure_black,
-                        'axes.edgecolor': pure_black,
-                        'xtick.color': pure_black,
-                        'ytick.color': pure_black,
+                        'axes.edgecolor': border_color, # 枠線の色
+                        'xtick.color': border_color,    # 目盛り線の色
+                        'ytick.color': border_color,
                         'axes.labelweight': 'bold',
-                        'axes.linewidth': 1.0      # 枠線をかなり太く
+                        'axes.linewidth': 0.8          # 枠線を標準的な太さに戻す
                     })
 
                     fig, ax = plt.subplots(figsize=(10, 5))
                     
-                    # プロット自体の線も太くして存在感を出す
-                    ax.plot(df['Date'], df['NDVI'], marker='o', markersize=6, color='#2ecc71', linestyle='-', linewidth=2.5)
+                    # プロットの線（視認性維持）
+                    ax.plot(df['Date'], df['NDVI'], marker='o', markersize=5, color='#2ecc71', linestyle='-', linewidth=2)
                     
-                    # 閾値の線（赤色を濃く、透過なしに）
-                    ax.axhline(y=0.3, color='#ff0000', linestyle='--', alpha=1.0, linewidth=1,
+                    # 閾値の線（赤色をハッキリ）
+                    ax.axhline(y=0.3, color='#ff0000', linestyle='--', alpha=0.8, linewidth=1.5,
                                label='閾値 (0.3)' if jp_font else 'Threshold (0.3)')
                     
-                    # タイトル（最大サイズ + 太字）
+                    # タイトル
                     ax.set_title(f"NDVI時系列推移 (過去 {analysis_years} 年間)" if jp_font else f"NDVI Time Series", 
-                                 fontproperties=jp_font_bold, fontsize=16, pad=20)
+                                 fontproperties=jp_font_bold, fontsize=15, pad=20)
                     
-                    # 軸ラベル（サイズアップ + 太字）
-                    ax.set_ylabel("NDVI", fontproperties=jp_font_bold, fontsize=13)
-                    ax.set_xlabel("日付" if jp_font else "Date", fontproperties=jp_font_bold, fontsize=13)
+                    # 軸ラベル
+                    ax.set_ylabel("NDVI", fontproperties=jp_font_bold, fontsize=12)
+                    ax.set_xlabel("日付" if jp_font else "Date", fontproperties=jp_font_bold, fontsize=12)
                     
-                    # 目盛り数字をすべて太字・黒に
-                    ax.tick_params(axis='both', which='major', labelsize=11, width=2.0)
+                    # 目盛り数字（太字は維持しつつ、線を細く）
+                    ax.tick_params(axis='both', which='major', labelsize=10, width=0.8)
                     for tick in ax.get_xticklabels():
                         tick.set_fontproperties(jp_font_bold)
                     for tick in ax.get_yticklabels():
                         tick.set_fontproperties(jp_font_bold)
 
-                    # 凡例（枠も黒く太く）
+                    # 凡例（枠線を細く）
                     if jp_font:
                         leg = ax.legend(prop=jp_font_bold, frameon=True, loc='upper right')
-                        leg.get_frame().set_edgecolor(pure_black)
-                        leg.get_frame().set_linewidth(1.5)
+                        leg.get_frame().set_edgecolor(border_color)
+                        leg.get_frame().set_linewidth(0.8)
                     else:
                         ax.legend()
                     
                     ax.set_ylim(-0.1, 1.0)
-                    ax.grid(True, linestyle='-', alpha=0.3, color='#888888') # グリッドは実線にして見やすく
+                    # グリッド（点線にして背景に馴染ませる）
+                    ax.grid(True, linestyle=':', alpha=0.4, color='#999999')
 
                     st.pyplot(fig)
 
