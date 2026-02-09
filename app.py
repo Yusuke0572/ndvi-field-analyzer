@@ -40,12 +40,19 @@ with st.sidebar:
     st.info("1. 左のツールバーで範囲を囲む\n2. 自動的に解析が始まります")
 
 # --- 3. 地図の表示（修正箇所） ---
+# --- 3. 地図の表示 ---
 m = geemap.Map(center=[35.181, 136.906], zoom=14)
 m.add_basemap('HYBRID')
 
-# m.to_streamlit() の代わりに st_folium() を使います。これが最も安定します。
-# 戻り値 map_data には、描画された図形のデータが自動的に入ります。
-map_data = st_folium(m, height=600, width=800, key="main_map")
+# 修正ポイント: m (geemapオブジェクト) をそのまま渡さず、
+# m.to_folium() を使って純粋な folium オブジェクトに変換して渡します。
+map_data = st_folium(
+    m.to_folium(),  # ここを修正
+    height=600, 
+    width=800, 
+    key="main_map",
+    returned_objects=["last_active_drawing"] # 必要なデータだけ指定すると動作が軽くなります
+)
 
 # --- 4. 解析ロジック ---
 # map_data が辞書型であることを確認して処理を開始
