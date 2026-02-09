@@ -39,14 +39,40 @@ with st.sidebar:
     analysis_years = st.slider("解析年数 (過去)", 1, 5, 3)
     st.info("1. 左のツールバーで範囲を囲む\n2. 自動的に解析が始まります")
 
-# --- 3. 地図の表示 ---
-m = geemap.Map(center=[35.181, 136.906], zoom=14)
-m.add_basemap('HYBRID')
+# --- 3. 地図の表示（安定版実装） ---
+# 1. 純粋な folium でベースマップを作成
+m = folium.Map(location=[35.181, 136.906], zoom_start=14)
 
-# 修正ポイント: 
-# 1. m をそのまま渡します（to_foliumは使いません）
-# 2. use_container_width=True を追加してレイアウトを安定させます
-# 3. returned_objects を明示的に指定して、解析に必要なデータだけを取得します
+# 2. Google Earth Engine の衛星写真レイヤーを手動で追加
+# GEEのTile URLを取得するヘルパー関数
+def add_ee_layer(self, ee_image_object, vis_params, name):
+    map_id_dict = ee.Image(ee_image_object).getMapId(vis_params)
+    folium.raster_layers.TileLayer(
+        tiles=map_id_dict['tile_fetcher'].url_format,
+        attr='Google Earth Engine',
+        name=name,
+        overlay=True,
+        control=True
+    ).add_to(self)
+
+# folium.MapにGEEレイヤー追加機能を持たせる
+folium.Map.add_ee_layer = add_ee_layer
+
+# ハイブリッド表示（衛星写真）の追加
+# 衛星写真の背景として Google のタイル等を表示したい場合は以下のように記述
+folium.TileLayer(
+    tiles='https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+    attr='Google',
+    name='Google Satellite',
+    overlay=False,
+    control=True
+).add_to(m)
+
+# 描画コントロールを追加（範囲選択用）
+from folium.plugins import Draw
+Draw(export=True).add_to(m)
+
+# 地図を表示
 map_data = st_folium(
     m, 
     height=600, 
