@@ -191,7 +191,7 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                     ax.plot(df['Date'], df['NDVI'], marker='o', markersize=6, color='#2ecc71', linestyle='-', linewidth=2.5)
                     
                     # 閾値の線（赤色を濃く、透過なしに）
-                    ax.axhline(y=0.3, color='#ff0000', linestyle='--', alpha=1.0, linewidth=2,
+                    ax.axhline(y=0.3, color='#ff0000', linestyle='--', alpha=1.0, linewidth=1,
                                label='閾値 (0.3)' if jp_font else 'Threshold (0.3)')
                     
                     # タイトル（最大サイズ + 太字）
