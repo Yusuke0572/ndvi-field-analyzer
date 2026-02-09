@@ -51,11 +51,11 @@ with st.sidebar:
     st.info("1. 左のツールバーで範囲を囲む\n2. 自動的に解析が始まります")
 
 # --- 3. 地図の表示（安定版実装） ---
-# 1. 純粋な folium でベースマップを作成
-m = folium.Map(location=[35.181, 136.906], zoom_start=14)
+# 1. ベースマップをシンプルなデザイン（CartoDB positron）に変更
+# これにより、衛星写真に切り替える前もお店の情報が目立たずスッキリします
+m = folium.Map(location=[35.181, 136.906], zoom_start=14, tiles='CartoDB positron')
 
-# 2. Google Earth Engine の衛星写真レイヤーを手動で追加
-# GEEのTile URLを取得するヘルパー関数
+# 2. Google Earth Engine のレイヤー追加機能（定義は維持）
 def add_ee_layer(self, ee_image_object, vis_params, name):
     map_id_dict = ee.Image(ee_image_object).getMapId(vis_params)
     folium.raster_layers.TileLayer(
@@ -66,33 +66,31 @@ def add_ee_layer(self, ee_image_object, vis_params, name):
         control=True
     ).add_to(self)
 
-# folium.MapにGEEレイヤー追加機能を持たせる
 folium.Map.add_ee_layer = add_ee_layer
 
-from folium.plugins import Geocoder
+# 住所検索機能（位置は維持）
 Geocoder(
-    collapsed=False,          # 最初から検索窓を開いておく場合はFalse
+    collapsed=False,
     position='topright', 
     add_marker=True,
     placeholder='住所や施設名で検索'
 ).add_to(m)
 
-# ハイブリッド表示（衛星写真）の追加
-# max_zoom と max_native_zoom を指定することで、ズームしても消えないようにします
+# 【重要修正】ラベルなしの高解像度衛星写真レイヤー
+# lyrs=s にすることで、店名、道路名、境界線がすべて消え、土地の状況に集中できます
 folium.TileLayer(
-    tiles='https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-    attr='Google',
+    tiles='https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+    attr='Google Satellite (No Labels)',
     name='Google Satellite',
     overlay=False,
     control=True,
-    max_zoom=22,         # 地図としてズーム可能な最大値
-    max_native_zoom=18   # Google衛星写真タイルが存在する最大ズームレベル（これ以上は引き伸ばして表示）
+    max_zoom=22,
+    max_native_zoom=18
 ).add_to(m)
 
-# 描画コントロールを追加（範囲選択用）
+# 描画コントロールを追加
 from folium.plugins import Draw
 Draw(export=True).add_to(m)
-
 # 地図を表示
 map_data = st_folium(
     m, 
