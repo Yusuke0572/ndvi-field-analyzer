@@ -6,9 +6,15 @@ import geemap
 import ee
 import pandas as pd
 import matplotlib.pyplot as plt
-import japanize_matplotlib
 from datetime import datetime
 import json
+
+# --- 0. 日本語豆腐対策（最新Python対応） ---
+import matplotlib
+from matplotlib import font_manager
+# Linux環境(Streamlit Cloud)で標準的なフォントを指定
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', 'sans-serif']
 
 # --- 1. セキュリティ設定（Earth Engine 認証） ---
 def authenticate_ee():
@@ -153,15 +159,19 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
 
                 with col2:
                     # グラフ描画
-                    fig, ax = plt.subplots(figsize=(10, 5))
-                    ax.plot(df['Date'], df['NDVI'], marker='o', markersize=4, color='#2ecc71', linestyle='-', linewidth=1)
-                    ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.5, label='閾値 (0.3)')
-                    ax.set_title(f"NDVI時系列推移 (過去 {analysis_years} 年間)")
-                    ax.set_ylabel("NDVI")
-                    ax.set_ylim(-0.1, 1.0)
-                    ax.grid(True, alpha=0.2)
-                    ax.legend()
-                    st.pyplot(fig)
+                    # --- 4. 解析ロジック内、グラフ描画部分 ---
+
+                    with col2:
+                        # グラフ描画
+                        fig, ax = plt.subplots(figsize=(10, 5))
+                        ax.plot(df['Date'], df['NDVI'], marker='o', markersize=4, color='#2ecc71', linestyle='-', linewidth=1)
+                        ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.5, label='Threshold (0.3)') # 英語ラベルへ
+                        ax.set_title(f"NDVI Time Series (Past {analysis_years} Years)") # 英語タイトルへ
+                        ax.set_ylabel("NDVI")
+                        ax.set_ylim(-0.1, 1.0)
+                        ax.grid(True, alpha=0.2)
+                        ax.legend()
+                        st.pyplot(fig)
 
                     # 画像ダウンロード
                     from io import BytesIO
