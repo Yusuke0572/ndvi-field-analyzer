@@ -159,11 +159,10 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                     gmap_url = f"https://www.google.com/maps?q={lat},{lon}"
                     st.markdown(f'### [📍 Google Mapで現地を確認]({gmap_url})')
 
-                # --- 4. 解析ロジック内、グラフ描画部分 ---
+# --- 4. 解析ロジック内、グラフ描画部分 ---
                 with col2:
                     font_path = 'fonts/NotoSansJP-Regular.ttf'
                     jp_font = None
-                    # 太字用のフォント設定（プロパティ）
                     jp_font_bold = None
 
                     if os.path.exists(font_path):
@@ -175,46 +174,47 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                     
                     fig, ax = plt.subplots(figsize=(10, 5))
                     
-                    # ラベル色の設定（真っ黒を避けた濃いグレー）
-                    label_color = '#333333'
+                    # 報告書で見やすい濃いグレー（真っ黒ではない）
+                    dark_gray = '#2c2c2c' 
 
-                    ax.plot(df['Date'], df['NDVI'], marker='o', markersize=4, color='#2ecc71', linestyle='-', linewidth=1.5)
+                    # プロット自体の線を少し太くし、視認性を向上
+                    ax.plot(df['Date'], df['NDVI'], marker='o', markersize=5, color='#2ecc71', linestyle='-', linewidth=2)
                     
-                    # 閾値の線
-                    ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.6, 
+                    # 閾値の線（赤色を少しハッキリさせる）
+                    ax.axhline(y=0.3, color='#d63031', linestyle='--', alpha=0.8, 
                                label='閾値 (0.3)' if jp_font else 'Threshold (0.3)')
                     
-                    # タイトル（サイズアップ + 太字 + 色指定）
+                    # タイトルの強化（太字 + 濃い色）
                     ax.set_title(f"NDVI時系列推移 (過去 {analysis_years} 年間)" if jp_font else f"NDVI Time Series", 
-                                 fontproperties=jp_font_bold, fontsize=14, color=label_color, pad=20)
+                                 fontproperties=jp_font_bold, fontsize=15, color=dark_gray, pad=20)
                     
-                    # 軸ラベル（色指定）
-                    ax.set_ylabel("NDVI", fontproperties=jp_font, fontsize=11, color=label_color)
-                    ax.set_xlabel("日付" if jp_font else "Date", fontproperties=jp_font, fontsize=11, color=label_color)
+                    # 軸ラベルの強化
+                    ax.set_ylabel("NDVI", fontproperties=jp_font_bold, fontsize=12, color=dark_gray)
+                    ax.set_xlabel("日付" if jp_font else "Date", fontproperties=jp_font_bold, fontsize=12, color=dark_gray)
                     
-                    # 軸の目盛り数字（ここを濃く太くするのがポイント）
+                    # 目盛り数字と目盛り線を濃くする
+                    ax.tick_params(axis='both', which='major', labelsize=10, color=dark_gray, labelcolor=dark_gray)
                     for tick in ax.get_xticklabels():
                         tick.set_fontproperties(jp_font)
-                        tick.set_color(label_color)
                     for tick in ax.get_yticklabels():
                         tick.set_fontproperties(jp_font)
-                        tick.set_color(label_color)
+
+                    # グラフの外枠（軸）をハッキリさせる
+                    for spine in ax.spines.values():
+                        spine.set_edgecolor(dark_gray)
+                        spine.set_linewidth(1.2) # 軸の線を少し太く
 
                     # 凡例
                     if jp_font:
-                        ax.legend(prop=jp_font, frameon=True, loc='upper right')
+                        ax.legend(prop=jp_font, frameon=True, loc='upper right', edgecolor=dark_gray)
                     else:
                         ax.legend()
                     
                     ax.set_ylim(-0.1, 1.0)
-                    ax.grid(True, alpha=0.15) # グリッドは少し薄くしてグラフを際立たせる
-                    
-                    # グラフ自体の枠線も少し濃くする
-                    for spine in ax.spines.values():
-                        spine.set_edgecolor('#cccccc')
+                    ax.grid(True, linestyle=':', alpha=0.4, color='#999999') # グリッドは点の線にして邪魔しない程度に
 
                     st.pyplot(fig)
-
+                    
                     # 画像ダウンロード
                     from io import BytesIO
                     buf = BytesIO()
