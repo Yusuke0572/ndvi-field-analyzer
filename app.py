@@ -237,4 +237,4 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
             st.error(f"解析エラーが発生しました: {e}")
 else:
     # まだ図形が描かれていない時の表示
-    st.info("👆 地図左側の「🔲（四角）」または「⬠（多角形）」ツールを選択して、解析したい範囲を囲んでください。")
+    st.info("👆 地図左側の「◼️（四角）」または「⬠（多角形）」ツールを選択して、解析したい範囲を囲んでください。")
