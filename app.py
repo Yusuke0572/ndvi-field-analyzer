@@ -159,36 +159,43 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                     gmap_url = f"https://www.google.com/maps?q={lat},{lon}"
                     st.markdown(f'### [📍 Google Mapで現地を確認]({gmap_url})')
 
+                # --- 4. 解析ロジック内、グラフ描画部分 ---
                 with col2:
-                    # グラフ描画
-                    # --- 4. 解析ロジック内、グラフ描画部分 ---
+                    font_path = 'fonts/NotoSansJP-Regular.ttf'
+                    jp_font = None
 
-                    with col2:
-                        # フォントの読み込み
-                        font_path = 'fonts/NotoSansJP-Regular.ttf'
-                        # フォントが存在する場合のみ適用（エラー回避のため）
-                        import os
-                        if os.path.exists(font_path):
+                    if os.path.exists(font_path):
+                        try:
                             jp_font = fm.FontProperties(fname=font_path)
-                        else:
+                            # テスト的にフォントを読み込んでみる（壊れていたらここでエラーを出す）
+                            test_fig = plt.figure()
+                            test_fig.text(0, 0, "test", fontproperties=jp_font)
+                            plt.close(test_fig)
+                        except Exception as e:
+                            st.error(f"フォント読み込みエラー: {e}")
                             jp_font = None
+                    
+                    if jp_font is None:
+                        st.warning("日本語フォントの形式が正しくありません。英語で表示します。")
 
-                        fig, ax = plt.subplots(figsize=(10, 5))
-                        ax.plot(df['Date'], df['NDVI'], marker='o', markersize=4, color='#2ecc71', linestyle='-', linewidth=1)
-                        
-                        # ラベルとタイトルに fontproperties を指定
-                        ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.5, label='閾値 (0.3)')
-                        ax.set_title(f"NDVI時系列推移 (過去 {analysis_years} 年間)", fontproperties=jp_font)
-                        ax.set_ylabel("NDVI", fontproperties=jp_font)
-                        ax.set_xlabel("日付", fontproperties=jp_font)
-                        
-                        # 凡例も日本語化
+                    fig, ax = plt.subplots(figsize=(10, 5))
+                    ax.plot(df['Date'], df['NDVI'], marker='o', markersize=4, color='#2ecc71', linestyle='-', linewidth=1)
+                    
+                    # 凡例・タイトル・ラベル
+                    ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.5, label='閾値 (0.3)' if jp_font else 'Threshold (0.3)')
+                    ax.set_title(f"NDVI時系列推移 (過去 {analysis_years} 年間)" if jp_font else f"NDVI Time Series ({analysis_years}Y)", fontproperties=jp_font)
+                    ax.set_ylabel("NDVI", fontproperties=jp_font)
+                    ax.set_xlabel("日付" if jp_font else "Date", fontproperties=jp_font)
+                    
+                    if jp_font:
                         ax.legend(prop=jp_font)
-                        
-                        ax.set_ylim(-0.1, 1.0)
-                        ax.grid(True, alpha=0.2)
-                        st.pyplot(fig)
-
+                    else:
+                        ax.legend()
+                    
+                    ax.set_ylim(-0.1, 1.0)
+                    ax.grid(True, alpha=0.2)
+                    st.pyplot(fig)
+                    
                     # 画像ダウンロード
                     from io import BytesIO
                     buf = BytesIO()
