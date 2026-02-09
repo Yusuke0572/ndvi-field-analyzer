@@ -159,7 +159,7 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                     gmap_url = f"https://www.google.com/maps?q={lat},{lon}"
                     st.markdown(f'### [📍 Google Mapで現地を確認]({gmap_url})')
 
-# --- 4. 解析ロジック内、グラフ描画部分 ---
+                # --- 4. 解析ロジック内、グラフ描画部分 ---
                 with col2:
                     font_path = 'fonts/NotoSansJP-Regular.ttf'
                     jp_font = None
@@ -214,7 +214,7 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                         spine.set_edgecolor('#cccccc')
 
                     st.pyplot(fig)
-                                        
+
                     # 画像ダウンロード
                     from io import BytesIO
                     buf = BytesIO()
