@@ -165,8 +165,8 @@ if isinstance(map_data, dict) and map_data.get("last_active_drawing"):
                         # グラフ描画
                         fig, ax = plt.subplots(figsize=(10, 5))
                         ax.plot(df['Date'], df['NDVI'], marker='o', markersize=4, color='#2ecc71', linestyle='-', linewidth=1)
-                        ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.5, label='Threshold (0.3)') # 英語ラベルへ
-                        ax.set_title(f"NDVI Time Series (Past {analysis_years} Years)") # 英語タイトルへ
+                        ax.axhline(y=0.3, color='#e74c3c', linestyle='--', alpha=0.5, label='閾値 (0.3)') # 英語ラベルへ
+                        ax.set_title(f"NDVI時系列グラフ (過去 {analysis_years} 年間)") # 英語タイトルへ
                         ax.set_ylabel("NDVI")
                         ax.set_ylim(-0.1, 1.0)
                         ax.grid(True, alpha=0.2)
