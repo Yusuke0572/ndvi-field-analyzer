@@ -6,6 +6,7 @@ import geemap
 import ee
 import pandas as pd
 import matplotlib.pyplot as plt
+import japanize_matplotlib
 from datetime import datetime
 import json
 
@@ -60,6 +61,14 @@ def add_ee_layer(self, ee_image_object, vis_params, name):
 # folium.MapにGEEレイヤー追加機能を持たせる
 folium.Map.add_ee_layer = add_ee_layer
 
+from folium.plugins import Geocoder
+Geocoder(
+    collapsed=False,          # 最初から検索窓を開いておく場合はFalse
+    position='topright', 
+    add_marker=True,
+    placeholder='住所や施設名で検索'
+).add_to(m)
+
 # ハイブリッド表示（衛星写真）の追加
 # max_zoom と max_native_zoom を指定することで、ズームしても消えないようにします
 folium.TileLayer(
@@ -85,14 +94,6 @@ map_data = st_folium(
     key="main_map",
     returned_objects=["last_active_drawing"]
 )
-
-# 2. 地図検索機能（Geocoder）を追加
-Geocoder(
-    collapsed=True,           # 最初はアイコンだけ表示
-    position='topright',      # 右上に配置
-    add_marker=True,          # 検索場所にピンを立てる
-    placeholder='場所を検索'    # 検索窓のテキスト
-).add_to(m)
 
 # --- 4. 解析ロジック ---
 # map_data が辞書型であることを確認して処理を開始
